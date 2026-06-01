@@ -82,7 +82,7 @@ Example:
 ```json
 {
   "name": "Charlie",
-  "age": 32,
+  "age": 33,
   "role": "Data Engineer"
 }
 ```
@@ -149,10 +149,85 @@ db.institute.find()
 ```mongosh
 db.institute.insertOne({
   name: "Charlie Warburg",
-  age: 32,
+  age: 33,
   role: "Data Engineering Student",
   location: "London",
   skills: ["SQL", "Python", "MongoDB"],
   previousExperience: "Senior Product Designer"
 })
+```
+
+# Further Work
+
+### What is Validation?
+
+Validation in MongoDB is used to control the structure and quality of the data being inserted into a collection.
+
+It allows us to define rules for documents, such as:
+
+- Required fields
+- Data types
+- Minimum or maximum values
+- Patterns for strings
+
+### Example
+
+```
+db.createCollection("students", {
+  validator: {
+    $jsonSchema: {
+      bsonType: "object",
+      required: ["name", "age", "course"],
+      properties: {
+        name: {
+          bsonType: "string",
+          description: "Name must be a string"
+        },
+        age: {
+          bsonType: "int",
+          minimum: 18,
+          description: "Age must be an integer and at least 18"
+        },
+        course: {
+          bsonType: "string",
+          description: "Course must be a string"
+        }
+      }
+    }
+  },
+  validationAction: "error"
+})
+```
+
+## Invalid Example
+
+```
+db.students.insertOne({
+  name: "Charlie",
+  age: "twenty",
+  course: "MongoDB"
+})
+```
+
+### Output
+```
+MongoServerError: Document failed validation
+```
+
+## Valid Example
+
+```
+db.students.insertOne({
+  name: "Charlie",
+  age: "twenty",
+  course: "MongoDB"
+})
+```
+
+### Output
+```
+{
+  acknowledged: true,
+  insertedId: ObjectId('685c4f8a9d7b3c1f2a6e1234')
+}
 ```
