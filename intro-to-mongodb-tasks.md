@@ -159,7 +159,7 @@ db.institute.insertOne({
 
 # Further Work
 
-### What is Validation?
+## 1. What is Validation?
 
 Validation in MongoDB is used to control the structure and quality of the data being inserted into a collection.
 
@@ -172,7 +172,7 @@ It allows us to define rules for documents, such as:
 
 ### Example
 
-```
+```js
 db.createCollection("students", {
   validator: {
     $jsonSchema: {
@@ -219,7 +219,7 @@ MongoServerError: Document failed validation
 ```
 db.students.insertOne({
   name: "Charlie",
-  age: "twenty",
+  age: 20,
   course: "MongoDB"
 })
 ```
@@ -228,6 +228,97 @@ db.students.insertOne({
 ```
 {
   acknowledged: true,
-  insertedId: ObjectId('685c4f8a9d7b3c1f2a6e1234')
+  insertedId: ObjectId('6a1da91c6d15950f844f2e77')
 }
+```
+
+## 2. Searching for Documents with Mongosh
+
+For this task, I created a collection called `films` to store data about my favourite films.
+
+### Create Collection with Validation
+
+```js
+db.createCollection("films", {
+  validator: {
+    $jsonSchema: {
+      bsonType: "object",
+      required: ["title", "director", "year", "genre", "rating"],
+      properties: {
+        title: {
+          bsonType: "string",
+          description: "Title must be a string and is required"
+        },
+        director: {
+          bsonType: "string",
+          description: "Director must be a string and is required"
+        },
+        year: {
+          bsonType: "int",
+          minimum: 1900,
+          maximum: 2100,
+          description: "Year must be an integer"
+        },
+        genre: {
+          bsonType: "string",
+          description: "Genre must be a string"
+        },
+        rating: {
+          bsonType: "double",
+          minimum: 0,
+          maximum: 10,
+          description: "Rating must be a number between 0 and 10"
+        }
+      }
+    }
+  },
+  validationAction: "error"
+})
+```
+
+### Insert One Document
+
+```js
+db.films.insertOne({
+  title: "Dune",
+  director: "Denis Villeneuve",
+  year: 2021,
+  genre: "Sci-Fi",
+  rating: 8.0
+})
+```
+
+### Insert Many Documents
+
+```js
+db.films.insertMany([
+  {
+    title: "Blade Runner 2049",
+    director: "Denis Villeneuve",
+    year: 2017,
+    genre: "Sci-Fi",
+    rating: 8.0
+  },
+  {
+    title: "The Dark Knight",
+    director: "Christopher Nolan",
+    year: 2008,
+    genre: "Action",
+    rating: 9.0
+  },
+  {
+    title: "Spirited Away",
+    director: "Hayao Miyazaki",
+    year: 2001,
+    genre: "Animation",
+    rating: 8.6
+  },
+  {
+    title: "Interstellar",
+    director: "Christopher Nolan",
+    year: 2014,
+    genre: "Sci-Fi",
+    rating: 8.7
+  }
+])
 ```
