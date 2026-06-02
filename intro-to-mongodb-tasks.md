@@ -276,6 +276,8 @@ db.createCollection("films", {
 })
 ```
 
+This creates a `films` collection with validation rules to ensure documents follow the correct structure and data types.
+
 ### Insert One Document
 
 ```js
@@ -287,6 +289,8 @@ db.films.insertOne({
   rating: 8.0
 })
 ```
+
+This inserts a single film document into the collection.
 
 ### Insert Many Documents
 
@@ -322,3 +326,165 @@ db.films.insertMany([
   }
 ])
 ```
+
+This inserts multiple film documents at once using `insertMany()`.
+
+### Searching for Documents
+
+```js
+db.films.find()
+```
+
+This returns all documents inside the `films` collection.
+
+```js
+db.films.findOne({ title: "Dune" })
+```
+
+This searches for a single document where the title is `"Dune"`.
+
+```js
+db.films.find({ genre: "Sci-Fi" })
+```
+
+This returns all films with the genre `"Sci-Fi"`.
+
+### Bonus: insert()
+
+```js
+db.films.insert({
+  title: "Inception",
+  director: "Christopher Nolan",
+  year: 2010,
+  genre: "Sci-Fi",
+  rating: 8.8
+})
+```
+
+`insert()` is an older MongoDB method used to insert documents. `insertOne()` and `insertMany()` are preferred because they are clearer and more modern.
+
+### Update an Existing Document
+
+```js
+db.films.updateOne(
+  { title: "Dune" },
+  { $set: { rating: 8.2 } }
+)
+```
+
+This updates the rating value for the film `"Dune"`.
+
+### Update Multiple Documents
+
+```js
+db.films.updateMany(
+  { genre: "Sci-Fi" },
+  { $set: { recommended: true } }
+)
+```
+
+This updates all Sci-Fi films and adds a `recommended` field.
+
+### Delete a Document
+
+```js
+db.films.deleteOne({
+  title: "Inception"
+})
+```
+
+This deletes the first document that matches the title `"Inception"`.
+
+### Delete Multiple Documents
+
+```js
+db.films.deleteMany({
+  genre: "Sci-Fi"
+})
+```
+
+This deletes all documents with the genre `"Sci-Fi"`.
+
+---
+
+# 3. Research Embedding vs Referencing in MongoDB
+
+## What is Embedding in MongoDB?
+
+Embedding means storing related data inside the same document.
+
+For example, an order document may contain customer information and product details inside a single document rather than splitting them into separate collections.
+
+### Why Use Embedding?
+- Faster reads because related data is stored together
+- Fewer queries are needed
+- Easier to retrieve complete related information
+- Good for one-to-one or one-to-few relationships
+
+### Embedding Example
+
+```json
+{
+  "customer": "Charlie",
+  "products": [
+    {
+      "name": "Keyboard",
+      "price": 100
+    },
+    {
+      "name": "Mouse",
+      "price": 40
+    }
+  ]
+}
+```
+
+This stores products directly inside the customer order document.
+
+---
+
+## What is Referencing in MongoDB?
+
+Referencing means storing related data in separate collections and linking them together using IDs.
+
+For example, customer data may exist in one collection while orders exist in another collection connected by a customer ID.
+
+### Why Use Referencing?
+- Reduces duplicated data
+- Better for large or complex datasets
+- Easier to update shared information
+- Good for one-to-many or many-to-many relationships
+
+### Referencing Example
+
+### Customers Collection
+
+```json
+{
+  "_id": 1,
+  "name": "Charlie"
+}
+```
+
+### Orders Collection
+
+```json
+{
+  "customerId": 1,
+  "product": "Keyboard"
+}
+```
+
+This links the order to the customer using the `customerId` field.
+
+---
+
+## Embedding vs Referencing Summary
+
+| Embedding | Referencing |
+|---|---|
+| Stores related data together | Stores related data separately |
+| Faster reads | Better for complex relationships |
+| Can duplicate data | Reduces duplication |
+| Good for smaller related datasets | Good for large scalable systems |
+| Simpler queries | More flexible structure |
