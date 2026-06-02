@@ -371,3 +371,60 @@ This demonstrates referencing in MongoDB using `ObjectId`.
 First, Darth Vader’s `_id` was retrieved from the `people` collection. That `_id` was then stored inside the `starships` collection as the `pilot` field.
 
 This creates a relationship between the `people` and `starships` collections without duplicating the character data.
+
+## Joining Collections with `$lookup`
+
+```js
+db.starships.aggregate([
+  {
+    $lookup: {
+      from: "people",
+      localField: "pilot",
+      foreignField: "_id",
+      as: "matched_pilot"
+    }
+  }
+])
+```
+
+This uses MongoDB’s `$lookup` aggregation stage to join the `starships` collection with the `people` collection.
+
+- `localField` is the field inside the current collection (`pilot`)
+- `foreignField` is the matching field in the `people` collection (`_id`)
+- `as` creates a new field containing the matched documents
+
+This works similarly to a SQL JOIN by linking related documents across collections using `ObjectId`.
+
+### Tradeoffs of Referencing
+
+Referencing reduces data redundancy because related information is stored separately rather than duplicated across many documents.
+
+It also allows more complex relationships and scalable database design.
+
+However, referencing can make queries more complex because collections often need to be joined using `$lookup`, which may reduce performance compared to embedding related data directly inside one document.
+
+```js
+db.starships.aggregate([
+  {
+    $lookup: {
+      from: "characters",
+      localField: "pilot",
+      foreignField: "_id",
+      as: "matched_pilot"
+    }
+  },
+  {
+    $project: {
+      name: 1,
+      model: 1,
+      "matched_pilot.name": 1
+    }
+  }
+])
+```
+
+`$project` is useful because it limits the output to only the fields we want to see.
+
+Without `$project`, MongoDB would return every field from both the `starships` and matched `characters` documents, which could make the output unnecessarily large and harder to read.
+
+Using `$project` creates cleaner results, reduces unnecessary data, and can improve query efficiency.
