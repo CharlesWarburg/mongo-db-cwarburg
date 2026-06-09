@@ -68,6 +68,9 @@ CSV/API → Data Lake → Databricks/Spark Transformations
 
 Modern platforms such as Databricks, Snowflake, and BigQuery commonly use ELT.
 
+Supporting diagram:
+- [ETL vs ELT diagram (Informatica)](https://www.informatica.com/blogs/etl-vs-elt-whats-the-difference.html)
+
 ---
 
 # Relational Data Processing
@@ -193,6 +196,179 @@ Examples:
 | Cost | Higher | Lower |
 | Analytics | Fast | Flexible |
 | Storage | Processed Data | Raw Data |
+
+Supporting diagram:
+- [Data lake overview (AWS)](https://aws.amazon.com/big-data/what-is-a-data-lake/)
+- [Data warehouse overview (AWS)](https://aws.amazon.com/data-warehouse)
+
+---
+
+# Inmon vs Kimball
+
+Two well-known approaches to data warehouse design are the **Inmon** approach and the **Kimball** approach.
+
+## Inmon Architecture
+
+Often described as the **Enterprise Data Warehouse** approach.
+
+### Characteristics
+
+- Top-down approach
+- A normalised data warehouse is created first
+- Data is then summarised and distributed into data marts
+- Data is treated as non-volatile
+- Data is generally not overwritten or deleted
+
+### Flow
+
+```text
+Source Systems
+      ↓
+Enterprise Data Warehouse
+      ↓
+Data Marts
+```
+
+---
+
+## Kimball Architecture
+
+Often described as the **Dimensional Data Warehouse** approach.
+
+### Characteristics
+
+- Bottom-up approach
+- Separate data marts are created first
+- Data marts often align to a single department or business area
+- A wider dimensional warehouse is built by combining those marts
+- Quicker and cheaper to set up initially
+- Can be harder to maintain over time
+
+### Flow
+
+```text
+Source Systems
+      ↓
+Data Marts
+      ↓
+Dimensional Data Warehouse
+```
+
+---
+
+# Dimensional Modelling
+
+Dimensional modelling is a common design style for analytics systems.
+
+It separates data into **fact tables** and **dimension tables**.
+
+Supporting diagram:
+- [Dimensional modeling overview (Microsoft Learn)](https://learn.microsoft.com/en-us/fabric/data-warehouse/dimensional-modeling-overview)
+- [Fact tables guidance (Microsoft Learn)](https://learn.microsoft.com/en-us/fabric/data-warehouse/dimensional-modeling-fact-tables)
+- [Dimension tables guidance (Microsoft Learn)](https://learn.microsoft.com/bg-bg/fabric//data-warehouse/dimensional-modeling-dimension-tables)
+
+## Fact Tables
+
+Fact tables represent business events.
+
+### Characteristics
+
+- Store measurement data
+- Often numeric
+- Easy to aggregate
+- Usually tied to a business process
+
+Example:
+
+```text
+Sales revenue by month by product
+```
+
+### Grain
+
+The **grain** is the level of detail stored in the fact table.
+
+Examples:
+
+- One row per sale
+- One row per order
+- One row per product per month
+
+---
+
+## Dimension Tables
+
+Dimension tables describe the people, products, dates, or objects connected to facts.
+
+### Characteristics
+
+- Store descriptive data
+- Often text-based
+- Used for filtering and labelling
+
+Examples:
+
+- Product details
+- Customer details
+- Calendar information
+
+---
+
+# Star Schema
+
+A star schema has a central fact table connected directly to multiple dimension tables.
+
+### Characteristics
+
+- One or more fact tables
+- Fact tables join to dimension tables using foreign keys
+- Simple structure
+- Widely used
+- Effective for simple queries
+- Widely supported by BI tools
+
+### Simplified Shape
+
+```text
+        Date
+          |
+Product - Fact Table - Customer
+          |
+       Location
+```
+
+Supporting diagram:
+- [Star schema guidance and example (Microsoft Learn)](https://learn.microsoft.com/en-us/power-bi/guidance/star-schema)
+
+---
+
+# Snowflake Schema
+
+A snowflake schema is similar to a star schema, but the dimension tables are further normalised.
+
+### Characteristics
+
+- Reduces disk usage
+- Low data redundancy
+- Requires more joins
+- Harder to query than a star schema
+
+### Simplified Shape
+
+```text
+             Region
+               |
+Country - Customer Dimension
+               |
+          Fact Table
+           /      \
+      Product    Date
+         |
+      Category
+```
+
+Supporting diagram:
+- [Design dimensional models for analytics (Microsoft Learn)](https://learn.microsoft.com/en-us/training/modules/design-dimensional-models-fabric/)
 
 ---
 
@@ -558,12 +734,14 @@ The Lakehouse combines:
 
 - Cheap storage
 - Massive scalability
+- Structured and unstructured data in original form
 
 ### Data Warehouse
 
 - Fast analytics
 - Governance
 - Reliability
+- More structure and control
 
 Result:
 
@@ -577,6 +755,23 @@ Lakehouse
 
 This is the architecture Databricks promotes.
 
+### Why Lakehouses Matter
+
+- Take the best aspects of data warehouses and data lakes
+- Can offer structure and control, including ACID reliability through tools like Delta Lake
+- Flexible and scalable
+- Often compute and storage can be decoupled
+- Governance can still be difficult
+
+### Data Lakes vs Lakehouses
+
+Data lakes are usually more raw and open-ended.
+
+Lakehouses add more structure, quality controls, and analytical reliability on top of low-cost scalable storage.
+
+Supporting diagram:
+- [Lakehouse architecture overview (Databricks)](https://docs.databricks.com/aws/en/lakehouse/)
+
 ---
 
 # Medallion Architecture
@@ -584,6 +779,9 @@ This is the architecture Databricks promotes.
 A common data-engineering pattern in Databricks.
 
 Think of it as progressively improving data quality.
+
+Supporting diagram:
+- [Medallion architecture diagram (Databricks)](https://docs.databricks.com/en/lakehouse/medallion.html)
 
 ---
 
