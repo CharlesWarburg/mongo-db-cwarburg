@@ -130,3 +130,44 @@ irisna.dropna().show()
 ```
 
 ![Task 12 Output](images/task12output.png)
+
+---
+
+## Task 13 - Create Two DataFrames and Join on species
+
+```python
+irisavg = iris.groupBy("species").agg(avg("sepal_length").alias("avg_sepal_length"))
+
+irismax = iris.groupBy("species").agg(max("sepal_length").alias("max_sepal_length"))
+
+iris_joined = irisavg.join(irismax, on="species")
+
+iris_joined.show()
+```
+
+![Task 13 Output](images/task13output.png)
+
+## Task 14 - Store a DataFrame as an SQL View
+
+```python
+iris.createOrReplaceTempView("iris_view")
+
+spark.sql("""
+SELECT *
+FROM iris_view
+""").show()
+```
+
+![Task 14 Output](images/task14output.png)
+
+## Task 15 - Run a Simple SQL SELECT Query Using PySpark
+
+```python
+spark.sql("""
+SELECT *
+FROM iris_view
+LIMIT 10
+""").show()
+```
+
+![Task 15 Output](images/task15output.png)
